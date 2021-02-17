@@ -5,26 +5,26 @@ const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('../config/environment/index')
 
 class UsersController {
-
-    static create(req, res) {
-        req.body.password = md5(req.body.password);
-        const user = new User(req.body);
-        user.save()
-            .then(newUser => {
-                res.status(201).send(newUser)
-            })
-            .catch((err) => {
-                console.log(err)
-                res.status(400).send(err)
-            })
+    static async create(req, res) {
+        try {
+            req.body.password = md5(req.body.password);
+            const user = new User(req.body);
+            const newUser = await user.save()
+            res.status(201).send(newUser)
+        } catch (err) {
+            console.log(err)
+            res.status(400).send(err)
+        }
     }
 
 
-    static login(req, res) {
-        User.findOne({
-            username: req.body.username,
-            password: md5(req.body.password)
-        }).then(user => {
+    static async login(req, res) {
+        try {
+            const user = await User.findOne({
+                username: req.body.username,
+                password: md5(req.body.password)
+            })
+
             if (!user) {
                 res.sendStatus(401);
                 return;
@@ -37,69 +37,47 @@ class UsersController {
             res.send({
                 token: token
             });
-        }).catch(err => {
+        } catch (err) {
             console.log(err);
             res.sendStatus(500);
-        });
+        };
     }
 
     static me(req, res) {
+        res.send(req.user)
+
+    }
+
+
+    static async checkEmail(req, res) {
         try {
-            const payload = jwt.verify(req.body.token, jwtSecret)
-            User.findById(payload._id)
-            .then(user => {
-                if (!user) {
-                    res.sendStatus(401);
-                    return;
-                }
-                res.send({
-                    _id:user._id,
-                    username:user.username,
-                    email:user.email
-                });
-            }).catch(err => {
-                console.log(err);
-                res.sendStatus(500)
+            const user = await User.findOne({
+                email: req.params.emailVal
             })
+            if (user) {
+                res.send(false)
+                return;
+            }
+            res.send(true);
         } catch (err) {
-            res.sendStatus(401)
+            res.sendStatus(500)
         }
-
     }
 
-
-    static checkEmail(req, res) {
-        User.findOne({
-            email: req.params.emailVal
-        }).then(user => {
-            if (user) {
-                console.log('found')
-                res.send(false)
-               
-                return;
-            }
-            res.send(true);
-            console.log('not found')
-        })
-        .catch((err) => {
-            res.sendStatus(500)
-        })
-
-    }
-    static checkUsername(req, res) {
-        User.findOne({
-            username: req.params.usernameVal
-        }).then(user => {
+    static async checkUsername(req, res) {
+        try {
+            const user = await User.findOne({
+                username: req.params.usernameVal
+            })
             if (user) {
                 res.send(false)
                 return;
             }
             res.send(true);
             console.log('not found')
-        })
-        .catch((err) => {
+        } catch (err) {
             res.sendStatus(500)
-        })
+        }
 
     }
 
