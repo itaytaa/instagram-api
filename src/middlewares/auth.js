@@ -3,7 +3,6 @@ const { jwtSecret } = require('../config/environment/index')
 
 function auth(req, res, next) {
     try {
-        console.log(req.headers.authorization)
         const token = req.headers.authorization
         req.user = jwt.verify(token, jwtSecret)
         next()

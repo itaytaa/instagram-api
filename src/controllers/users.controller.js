@@ -2,8 +2,9 @@
 const User = require('../models/user')
 const md5 = require('md5')
 const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config/environment/index')
-
+const { jwtSecret } = require('../config/environment/index');
+const { findOne } = require('../models/user');
+const Post = require('../models/post')
 class UsersController {
     static async create(req, res) {
         try {
@@ -80,6 +81,51 @@ class UsersController {
         }
 
     }
+
+
+    static async Posts(req, res) {
+        try {
+            const user = await User.findOne({
+                username: req.params.username
+            })
+            if (!user) {
+                res.sendStatus(404)
+                return
+            }
+            const posts = await Post.find({
+                user: user._id
+            }).sort({createdAt:req.query.sort || -1 })
+                .populate('user', ['username', 'avatar'])
+                
+            res.json(posts)
+        } catch (err) {
+            console.log(err)
+            res.sendStatus(500)
+        }
+
+    }
+
+    static async getUser(req, res) {
+        try {
+            const user = await User.findOne({
+                username: req.params.username
+            })
+            if (!user) {
+                res.sendStatus(404)
+                return
+            }
+            const { _id, avatar } = user
+            res.json({ _id, username, avatar })
+        } catch (err) {
+            console.log(err)
+            res.sendStatus(500)
+        }
+
+    }
+
+
+
+
 
 
 }

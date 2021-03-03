@@ -7,7 +7,7 @@ const Post = mongoose.model('Post', {
         required: true,
         ref: 'User'
     },
-    content: {
+    description: {
         type: String,
     },
     image: {
