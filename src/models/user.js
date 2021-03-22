@@ -5,17 +5,17 @@ const User = mongoose.model('User', {
     username: {
         type: String,
         required: true,
-        trim:true
+        trim: true
     },
     password: {
         type: String,
         required: true,
-        trim:true
+        trim: true
     },
     email: {
         type: String,
         required: true,
-        trim:true
+        trim: true
     },
     bio: String,
     avatar: String,
@@ -23,7 +23,9 @@ const User = mongoose.model('User', {
         type: Date,
         required: true,
         default: () => new Date()
-    }
+    },
+    followers: [mongoose.ObjectId]
+
 });
 
 module.exports = User;
