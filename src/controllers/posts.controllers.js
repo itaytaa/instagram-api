@@ -1,14 +1,18 @@
 const Post = require('../models/post')
 const fs = require('fs').promises;
-
+const User = require('../models/user')
 const Comment = require('../models/comment')
 class PostsController {
 
     static async feed(req, res) {
-
         try {
-
-            const posts = await Post.find().populate('user', ['username', 'avatar']).sort({ createdAt: req.query.sort || 1 })
+           const  followers = await User.find({ followers: req.user._id })
+            let followersId = followers.map(user => {
+                return user._id
+            })
+            followersId.push(req.user._id)
+            console.log(followersId)
+            const posts = await Post.find({ "user": { $in: followersId } }).populate('user', ['username', 'avatar']).sort({ createdAt: req.query.sort || 1 })
             res.send(posts)
         } catch {
             res.sendStatus(500)
@@ -107,8 +111,7 @@ class PostsController {
         console.log(id)
         const userId = req.user._id;
         try {
-            const comment= await Comment.findByIdAndRemove(id)
-            console.log(comment)
+            const comment = await Comment.findByIdAndRemove(id)
             if (comment) {
                 res.status(200).send(comment)
             }

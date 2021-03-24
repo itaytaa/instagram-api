@@ -11,8 +11,8 @@ routes.put('/user', UsersController.create);
 routes.post('/user/edit/:id', auth, avatar.single('image'), UsersController.editUser);
 routes.post('/user/login', UsersController.login);
 routes.post('/user/me', auth, UsersController.me);
-routes.get('/user/is-email-unique/:emailVal', UsersController.checkEmail);
 routes.get('/user/is-username-unique/:usernameVal', UsersController.checkUsername);
+routes.get('/user/is-email-unique/:emailVal', UsersController.checkEmail);
 routes.get('/user/:username/posts', auth, UsersController.Posts);
 routes.get('/user/:username', auth, UsersController.getUser);
 routes.post('/user/:id/follow', auth, UsersController.follow)
@@ -29,7 +29,7 @@ routes.delete('/post/:id/delete-comment', auth, PostsController.deleteComment)
 
 routes.post('/comment/:id/like', auth, PostsController.likeComment)
 routes.delete('/comment/:id/unLike/:userId', auth, PostsController.unLikeComment)
-// routes.post('/comment/:id/unlike', auth, PostsController.unLikeComment)
+
 
 routes.get('/post/:id', auth, PostsController.getPost)
 routes.put('/post', auth, upload.single('image'), PostsController.create)
